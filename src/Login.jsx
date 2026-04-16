@@ -2,6 +2,7 @@ import { useState } from "react";
 import Register from "./Register";
 import toast from "react-hot-toast";
 import logo from "./assets/logo.png";
+import BASE_URL from "./api";
 
 function Login({ setUser }) {
   const [username, setUsername] = useState("");
@@ -17,21 +18,28 @@ function Login({ setUser }) {
 
     setLoading(true);
 
-    const res = await fetch("http://localhost:5000/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    });
+    try {
+      const res = await fetch(`${BASE_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-    setLoading(false);
-
-    if (res.ok) {
       const data = await res.json();
-      setUser(data);
-    } else {
-      toast.error("Invalid credentials");
+
+      setLoading(false);
+
+      if (res.ok) {
+        setUser(data);
+        toast.success("Login successful");
+      } else {
+        toast.error(data.message || "Invalid credentials");
+      }
+    } catch (err) {
+      setLoading(false);
+      toast.error("Server error");
     }
   };
 

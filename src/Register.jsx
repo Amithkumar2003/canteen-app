@@ -1,6 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import logo from "./assets/logo.png";
+import BASE_URL from "./api";
 
 function Register({ setShowLogin }) {
   const [username, setUsername] = useState("");
@@ -15,21 +16,28 @@ function Register({ setShowLogin }) {
 
     setLoading(true);
 
-    const res = await fetch("http://localhost:5000/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    });
+    try {
+      const res = await fetch(`${BASE_URL}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-    setLoading(false);
+      const data = await res.json();
 
-    if (res.ok) {
-      toast.success("Account created");
-      setShowLogin(false);
-    } else {
-      toast.error("Registration failed");
+      setLoading(false);
+
+      if (res.ok) {
+        toast.success("Account created");
+        setShowLogin(false);
+      } else {
+        toast.error(data.message || "Registration failed");
+      }
+    } catch (err) {
+      setLoading(false);
+      toast.error("Server error");
     }
   };
 
