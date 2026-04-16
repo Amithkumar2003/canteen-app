@@ -8,18 +8,16 @@ app.use(cors());
 app.use(express.json());
 
 
-// ================= MONGODB ATLAS CONNECTION =================
+// ================= MONGODB CONNECTION =================
 
-mongoose.connect("mongodb://amithkumarkaglijaddu_db_user:Amith2026@cluster0-shard-00-00.585rjpz.mongodb.net:27017,cluster0-shard-00-01.585rjpz.mongodb.net:27017,cluster0-shard-00-02.585rjpz.mongodb.net:27017/canteenDB?ssl=true&replicaSet=atlas-585rjpz-shard-0&authSource=admin&retryWrites=true&w=majority");
-
-mongoose.connection.on("connected", () => {
-  console.log("MongoDB Atlas connected");
-  setupAdmin();
-});
-
-mongoose.connection.on("error", (err) => {
-  console.log("MongoDB error:", err);
-});
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB Atlas connected");
+    setupAdmin();
+  })
+  .catch((err) => {
+    console.log("MongoDB connection error:", err);
+  });
 
 
 // ================= MODELS =================
@@ -54,7 +52,7 @@ async function setupAdmin() {
       role: "admin",
     });
 
-    console.log("Admin reset successfully");
+    console.log("Admin ready");
   } catch (err) {
     console.log("Admin setup error:", err);
   }
