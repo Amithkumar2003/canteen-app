@@ -6,7 +6,7 @@ import BASE_URL from "./api";
 function Admin({ logout }) {
   const [orders, setOrders] = useState([]);
 
-  // Fetch Orders
+  // FETCH ORDERS
   const fetchOrders = async () => {
     try {
       const res = await fetch(`${BASE_URL}/orders`);
@@ -17,8 +17,15 @@ function Admin({ logout }) {
     }
   };
 
+  // 🔥 AUTO REFRESH (REAL-TIME LIKE)
   useEffect(() => {
-    fetchOrders();
+    fetchOrders(); // initial load
+
+    const interval = setInterval(() => {
+      fetchOrders(); // every 3 seconds
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // UPDATE STATUS
@@ -46,7 +53,7 @@ function Admin({ logout }) {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
 
-      {/* Header */}
+      {/* HEADER */}
       <div className="flex justify-between items-center mb-6 bg-white p-4 rounded shadow">
         <div className="flex items-center gap-3">
           <img
@@ -72,7 +79,7 @@ function Admin({ logout }) {
         </button>
       </div>
 
-      {/* Orders */}
+      {/* ORDERS */}
       {orders.length === 0 ? (
         <p className="text-center text-gray-500">
           No orders available
@@ -103,7 +110,7 @@ function Admin({ logout }) {
                   {order.time}
                 </p>
 
-                {/* Items */}
+                {/* ITEMS */}
                 {order.items.map((item, i) => (
                   <div key={i} className="flex justify-between">
                     <span>{item.name}</span>
@@ -111,12 +118,12 @@ function Admin({ logout }) {
                   </div>
                 ))}
 
-                {/* Total */}
+                {/* TOTAL */}
                 <p className="mt-2 font-semibold">
                   Total: ₹{total}
                 </p>
 
-                {/* Status */}
+                {/* STATUS */}
                 <p className="mt-2">
                   Status:{" "}
                   <span
@@ -134,31 +141,37 @@ function Admin({ logout }) {
                   </span>
                 </p>
 
-                {/* Buttons */}
+                {/* BUTTONS */}
                 <div className="flex gap-2 mt-3">
                   <button
-                    onClick={() => updateStatus(order._id, "Preparing")}
+                    onClick={() =>
+                      updateStatus(order._id, "Preparing")
+                    }
                     className="bg-yellow-500 text-white px-2 py-1 rounded"
                   >
                     Preparing
                   </button>
 
                   <button
-                    onClick={() => updateStatus(order._id, "Ready")}
+                    onClick={() =>
+                      updateStatus(order._id, "Ready")
+                    }
                     className="bg-blue-500 text-white px-2 py-1 rounded"
                   >
                     Ready
                   </button>
 
                   <button
-                    onClick={() => updateStatus(order._id, "Completed")}
+                    onClick={() =>
+                      updateStatus(order._id, "Completed")
+                    }
                     className="bg-green-600 text-white px-2 py-1 rounded"
                   >
                     Completed
                   </button>
                 </div>
 
-                {/* Delete */}
+                {/* DELETE */}
                 {order.status === "Completed" && (
                   <button
                     onClick={() => deleteOrder(order._id)}
