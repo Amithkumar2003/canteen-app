@@ -16,6 +16,9 @@ function UserApp({ logout }) {
   const [userOrder, setUserOrder] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // 🔥 NEW STATE (popup)
+  const [showCart, setShowCart] = useState(false);
+
   const categories = ["All", "Snacks", "Meals", "Drinks"];
 
   // ADD TO CART
@@ -93,6 +96,7 @@ function UserApp({ logout }) {
 
         setCart([]);
         setTableNumber("");
+        setShowCart(false);
       }
     } catch {
       setLoading(false);
@@ -100,7 +104,7 @@ function UserApp({ logout }) {
     }
   };
 
-  // LIVE STATUS
+  // STATUS UPDATE
   useEffect(() => {
     if (!userOrder?._id) return;
 
@@ -189,11 +193,8 @@ function UserApp({ logout }) {
           ))}
         </div>
 
-        {/* CART (DESKTOP STICKY) */}
-        <div
-          id="cart-section"
-          className="bg-white p-4 rounded shadow sticky top-4 h-fit hidden md:block"
-        >
+        {/* DESKTOP CART */}
+        <div className="bg-white p-4 rounded shadow sticky top-4 h-fit hidden md:block">
           <Cart cart={cart} setCart={setCart} />
 
           <p className="font-bold mt-2">Total: ₹{total}</p>
@@ -221,7 +222,6 @@ function UserApp({ logout }) {
       {/* 📱 MOBILE CART BAR */}
       {cart.length > 0 && (
         <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg p-3 flex justify-between items-center md:hidden z-50">
-
           <div>
             <p className="font-semibold text-sm">
               {cart.length} item{cart.length > 1 && "s"}
@@ -230,15 +230,49 @@ function UserApp({ logout }) {
           </div>
 
           <button
-            onClick={() =>
-              document
-                .getElementById("cart-section")
-                ?.scrollIntoView({ behavior: "smooth" })
-            }
+            onClick={() => setShowCart(true)}
             className="bg-green-600 text-white px-4 py-2 rounded"
           >
             View Cart
           </button>
+        </div>
+      )}
+
+      {/* 📱 MOBILE CART POPUP */}
+      {showCart && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-end md:hidden">
+          <div className="bg-white w-full p-4 rounded-t-xl max-h-[80%] overflow-y-auto">
+
+            <button
+              onClick={() => setShowCart(false)}
+              className="mb-3 text-red-500"
+            >
+              Close
+            </button>
+
+            <Cart cart={cart} setCart={setCart} />
+
+            <p className="font-bold mt-2">Total: ₹{total}</p>
+
+            <select
+              value={tableNumber}
+              onChange={(e) => setTableNumber(e.target.value)}
+              className="mt-2 w-full p-2 border rounded"
+            >
+              <option value="">Select Table</option>
+              {[1,2,3,4,5,6,7,8,9,10].map((t) => (
+                <option key={t}>Table {t}</option>
+              ))}
+            </select>
+
+            <button
+              onClick={placeOrder}
+              className="mt-3 w-full bg-green-600 text-white py-2 rounded"
+            >
+              Place Order
+            </button>
+
+          </div>
         </div>
       )}
     </div>
