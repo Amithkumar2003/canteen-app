@@ -15,8 +15,6 @@ function UserApp({ logout }) {
   const [search, setSearch] = useState("");
   const [userOrder, setUserOrder] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  // 🔥 NEW STATE (popup)
   const [showCart, setShowCart] = useState(false);
 
   const categories = ["All", "Snacks", "Meals", "Drinks"];
@@ -219,9 +217,10 @@ function UserApp({ logout }) {
         </div>
       </div>
 
-      {/* 📱 MOBILE CART BAR */}
+      {/* MOBILE CART BAR */}
       {cart.length > 0 && (
-        <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg p-3 flex justify-between items-center md:hidden z-50">
+        <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg p-3 flex justify-between items-center md:hidden z-[999]">
+
           <div>
             <p className="font-semibold text-sm">
               {cart.length} item{cart.length > 1 && "s"}
@@ -230,17 +229,21 @@ function UserApp({ logout }) {
           </div>
 
           <button
-            onClick={() => setShowCart(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded"
+            onClick={() => {
+              console.log("CLICK WORKING");
+              setShowCart(true);
+            }}
+            className="bg-green-600 text-white px-4 py-2 rounded relative z-[999]"
           >
             View Cart
           </button>
         </div>
       )}
 
-      {/* 📱 MOBILE CART POPUP */}
+      {/* MOBILE POPUP */}
       {showCart && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-end md:hidden">
+        <div className="fixed inset-0 bg-black/40 z-[1000] flex items-end md:hidden">
+
           <div className="bg-white w-full p-4 rounded-t-xl max-h-[80%] overflow-y-auto">
 
             <button
