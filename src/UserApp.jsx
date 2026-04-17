@@ -38,7 +38,7 @@ function UserApp({ logout }) {
     0
   );
 
-  // FILTER ITEMS
+  // FILTER
   const filteredItems = foodItems.filter((item) => {
     const matchCategory =
       category === "All" || item.category === category;
@@ -93,43 +93,34 @@ function UserApp({ logout }) {
 
         setCart([]);
         setTableNumber("");
-      } else {
-        toast.error("Order failed");
       }
-    } catch (err) {
+    } catch {
       setLoading(false);
-      console.log(err);
       toast.error("Server error");
     }
   };
 
-  // 🔥 LIVE STATUS UPDATE + POPUP
+  // LIVE STATUS
   useEffect(() => {
     if (!userOrder?._id) return;
 
     const interval = setInterval(async () => {
-      try {
-        const res = await fetch(`${BASE_URL}/orders`);
-        const data = await res.json();
+      const res = await fetch(`${BASE_URL}/orders`);
+      const data = await res.json();
 
-        const found = data.find(
-          (o) => String(o._id) === String(userOrder._id)
-        );
+      const found = data.find(
+        (o) => String(o._id) === String(userOrder._id)
+      );
 
-        if (found) {
-
-          // 🎉 POPUP WHEN READY
-          if (
-            userOrder.status !== "Ready" &&
-            found.status === "Ready"
-          ) {
-            toast.success("🎉 Your order is ready!");
-          }
-
-          setUserOrder(found);
+      if (found) {
+        if (
+          userOrder.status !== "Ready" &&
+          found.status === "Ready"
+        ) {
+          toast.success("Your order is ready!");
         }
-      } catch (err) {
-        console.log(err);
+
+        setUserOrder(found);
       }
     }, 3000);
 
@@ -137,20 +128,13 @@ function UserApp({ logout }) {
   }, [userOrder]);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-8">
+    <div className="min-h-screen bg-gray-100 p-4 md:p-8 pb-24 md:pb-8">
 
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6 bg-white p-4 rounded shadow">
         <div className="flex items-center gap-3">
           <img src={logo} className="w-10 h-10 rounded-full" />
-          <div>
-            <h1 className="text-xl font-bold">
-              Sahyadri Canteen
-            </h1>
-            <p className="text-gray-500 text-sm">
-              Campus Food Ordering
-            </p>
-          </div>
+          <h1 className="text-xl font-bold">Sahyadri Canteen</h1>
         </div>
 
         <button
@@ -205,8 +189,11 @@ function UserApp({ logout }) {
           ))}
         </div>
 
-        {/* CART */}
-        <div className="bg-white p-4 rounded shadow sticky top-4 h-fit">
+        {/* CART (DESKTOP STICKY) */}
+        <div
+          id="cart-section"
+          className="bg-white p-4 rounded shadow sticky top-4 h-fit hidden md:block"
+        >
           <Cart cart={cart} setCart={setCart} />
 
           <p className="font-bold mt-2">Total: ₹{total}</p>
@@ -228,55 +215,32 @@ function UserApp({ logout }) {
           >
             {loading ? "Placing..." : "Place Order"}
           </button>
-
-          {/* 🔥 ORDER STATUS + SUMMARY */}
-          {userOrder && (
-            <div className="mt-4 p-4 bg-gray-100 rounded">
-
-              <p className="font-semibold mb-2">Order Status:</p>
-
-              <span
-                className={`px-3 py-1 rounded text-white text-sm ${
-                  userOrder.status === "Pending"
-                    ? "bg-gray-500"
-                    : userOrder.status === "Preparing"
-                    ? "bg-yellow-500"
-                    : userOrder.status === "Ready"
-                    ? "bg-blue-500"
-                    : "bg-green-600"
-                }`}
-              >
-                {userOrder.status}
-              </span>
-
-              <p className="mt-2 text-sm text-gray-600">
-                Table: {userOrder.table}
-              </p>
-
-              <div className="mt-3">
-                {userOrder.items.map((item, i) => (
-                  <div key={i} className="flex justify-between">
-                    <span>{item.name}</span>
-                    <span>
-                      x{item.qty} ₹{item.price * item.qty}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <p className="mt-3 font-bold text-lg">
-                Total: ₹
-                {userOrder.items.reduce(
-                  (sum, item) => sum + item.price * item.qty,
-                  0
-                )}
-              </p>
-
-            </div>
-          )}
         </div>
-
       </div>
+
+      {/* 📱 MOBILE CART BAR */}
+      {cart.length > 0 && (
+        <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg p-3 flex justify-between items-center md:hidden z-50">
+
+          <div>
+            <p className="font-semibold text-sm">
+              {cart.length} item{cart.length > 1 && "s"}
+            </p>
+            <p className="text-sm text-gray-600">₹{total}</p>
+          </div>
+
+          <button
+            onClick={() =>
+              document
+                .getElementById("cart-section")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
+            className="bg-green-600 text-white px-4 py-2 rounded"
+          >
+            View Cart
+          </button>
+        </div>
+      )}
     </div>
   );
 }
