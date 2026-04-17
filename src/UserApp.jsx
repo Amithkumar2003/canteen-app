@@ -87,7 +87,7 @@ function UserApp({ logout }) {
 
         setUserOrder({
           ...orderData,
-          _id: data.orderId, // ✅ store ID
+          _id: data.orderId,
           status: "Pending",
         });
 
@@ -103,7 +103,7 @@ function UserApp({ logout }) {
     }
   };
 
-  // 🔥 LIVE STATUS UPDATE (FIXED)
+  // 🔥 LIVE STATUS UPDATE + POPUP
   useEffect(() => {
     if (!userOrder?._id) return;
 
@@ -113,10 +113,19 @@ function UserApp({ logout }) {
         const data = await res.json();
 
         const found = data.find(
-          (o) => String(o._id) === String(userOrder._id) // ✅ FIX
+          (o) => String(o._id) === String(userOrder._id)
         );
 
         if (found) {
+
+          // 🎉 POPUP WHEN READY
+          if (
+            userOrder.status !== "Ready" &&
+            found.status === "Ready"
+          ) {
+            toast.success("🎉 Your order is ready!");
+          }
+
           setUserOrder(found);
         }
       } catch (err) {
@@ -125,7 +134,7 @@ function UserApp({ logout }) {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [userOrder?._id]);
+  }, [userOrder]);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
@@ -220,26 +229,49 @@ function UserApp({ logout }) {
             {loading ? "Placing..." : "Place Order"}
           </button>
 
-          {/* ✅ ORDER STATUS + DETAILS */}
+          {/* 🔥 ORDER STATUS + SUMMARY */}
           {userOrder && (
-            <div className="mt-4 p-3 bg-gray-100 rounded">
-              <p className="font-semibold">Status:</p>
-              <p className="text-lg font-bold">
-                {userOrder.status}
-              </p>
+            <div className="mt-4 p-4 bg-gray-100 rounded">
 
-              <p className="text-sm text-gray-600">
+              <p className="font-semibold mb-2">Order Status:</p>
+
+              <span
+                className={`px-3 py-1 rounded text-white text-sm ${
+                  userOrder.status === "Pending"
+                    ? "bg-gray-500"
+                    : userOrder.status === "Preparing"
+                    ? "bg-yellow-500"
+                    : userOrder.status === "Ready"
+                    ? "bg-blue-500"
+                    : "bg-green-600"
+                }`}
+              >
+                {userOrder.status}
+              </span>
+
+              <p className="mt-2 text-sm text-gray-600">
                 Table: {userOrder.table}
               </p>
 
-              <div className="mt-2">
+              <div className="mt-3">
                 {userOrder.items.map((item, i) => (
                   <div key={i} className="flex justify-between">
                     <span>{item.name}</span>
-                    <span>x{item.qty}</span>
+                    <span>
+                      x{item.qty} ₹{item.price * item.qty}
+                    </span>
                   </div>
                 ))}
               </div>
+
+              <p className="mt-3 font-bold text-lg">
+                Total: ₹
+                {userOrder.items.reduce(
+                  (sum, item) => sum + item.price * item.qty,
+                  0
+                )}
+              </p>
+
             </div>
           )}
         </div>
