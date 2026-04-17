@@ -16,8 +16,6 @@ function UserApp({ logout }) {
   const [userOrder, setUserOrder] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showCart, setShowCart] = useState(false);
-
-  // ✅ NEW STATE
   const [showOrder, setShowOrder] = useState(false);
 
   const categories = ["All", "Snacks", "Meals", "Drinks"];
@@ -129,7 +127,7 @@ function UserApp({ logout }) {
   }, [userOrder]);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-8 pb-24 md:pb-8">
+    <div className="min-h-screen bg-gray-100 p-4 md:p-8 pb-32 md:pb-8">
 
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6 bg-white p-4 rounded shadow">
@@ -141,7 +139,6 @@ function UserApp({ logout }) {
 
         <div className="flex gap-2">
 
-          {/* ✅ CHECK ORDER BUTTON */}
           {userOrder && (
             <button
               onClick={() => setShowOrder(true)}
@@ -229,7 +226,66 @@ function UserApp({ logout }) {
         </div>
       </div>
 
-      {/* ✅ ORDER POPUP */}
+      {/* ✅ MOBILE TABLE SELECT (NEW FIX) */}
+      {cart.length > 0 && (
+        <div className="fixed bottom-20 left-0 w-full px-3 md:hidden z-[998]">
+          <select
+            value={tableNumber}
+            onChange={(e) => setTableNumber(e.target.value)}
+            className="w-full p-3 border rounded shadow bg-white"
+          >
+            <option value="">Select Table</option>
+            {[1,2,3,4,5,6,7,8,9,10].map((t) => (
+              <option key={t}>Table {t}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* MOBILE CART BAR */}
+      {cart.length > 0 && (
+        <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg p-3 flex justify-between items-center md:hidden z-[999]">
+          <div>
+            <p className="font-semibold text-sm">
+              {cart.length} items
+            </p>
+            <p className="text-sm text-gray-600">₹{total}</p>
+          </div>
+
+          <button
+            onClick={() => setShowCart(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded"
+          >
+            View Cart
+          </button>
+        </div>
+      )}
+
+      {/* MOBILE CART POPUP */}
+      {showCart && (
+        <div className="fixed inset-0 bg-black/40 z-[1000] flex items-end md:hidden">
+          <div className="bg-white w-full p-4 rounded-t-xl max-h-[80%] overflow-y-auto">
+            <button
+              onClick={() => setShowCart(false)}
+              className="mb-3 text-red-500"
+            >
+              Close
+            </button>
+
+            <Cart cart={cart} setCart={setCart} />
+            <p className="font-bold mt-2">Total: ₹{total}</p>
+
+            <button
+              onClick={placeOrder}
+              className="mt-3 w-full bg-green-600 text-white py-2 rounded"
+            >
+              Place Order
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ORDER POPUP */}
       {showOrder && userOrder && (
         <div className="fixed inset-0 bg-black/40 z-[1000] flex items-center justify-center">
           <div className="bg-white p-5 rounded shadow w-[90%] max-w-sm">
@@ -265,50 +321,6 @@ function UserApp({ logout }) {
               Close
             </button>
 
-          </div>
-        </div>
-      )}
-
-      {/* MOBILE CART BAR */}
-      {cart.length > 0 && (
-        <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg p-3 flex justify-between items-center md:hidden z-[999]">
-          <div>
-            <p className="font-semibold text-sm">
-              {cart.length} items
-            </p>
-            <p className="text-sm text-gray-600">₹{total}</p>
-          </div>
-
-          <button
-            onClick={() => setShowCart(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded"
-          >
-            View Cart
-          </button>
-        </div>
-      )}
-
-      {/* MOBILE CART POPUP */}
-      {showCart && (
-        <div className="fixed inset-0 bg-black/40 z-[1000] flex items-end md:hidden">
-          <div className="bg-white w-full p-4 rounded-t-xl max-h-[80%] overflow-y-auto">
-            <button
-              onClick={() => setShowCart(false)}
-              className="mb-3 text-red-500"
-            >
-              Close
-            </button>
-
-            <Cart cart={cart} setCart={setCart} />
-
-            <p className="font-bold mt-2">Total: ₹{total}</p>
-
-            <button
-              onClick={placeOrder}
-              className="mt-3 w-full bg-green-600 text-white py-2 rounded"
-            >
-              Place Order
-            </button>
           </div>
         </div>
       )}
