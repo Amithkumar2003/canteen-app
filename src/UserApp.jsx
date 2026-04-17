@@ -13,11 +13,12 @@ function UserApp({ logout }) {
   const [tableNumber, setTableNumber] = useState("");
   const [category, setCategory] = useState("All");
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
   const [userOrder, setUserOrder] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const categories = ["All", "Snacks", "Meals", "Drinks"];
 
+  // ADD TO CART
   const addToCart = (item) => {
     const existing = cart.find((i) => i.id === item.id);
 
@@ -37,6 +38,7 @@ function UserApp({ logout }) {
     0
   );
 
+  // FILTER ITEMS
   const filteredItems = foodItems.filter((item) => {
     const matchCategory =
       category === "All" || item.category === category;
@@ -48,14 +50,15 @@ function UserApp({ logout }) {
     return matchCategory && matchSearch;
   });
 
+  // PLACE ORDER
   const placeOrder = async () => {
     if (cart.length === 0) {
-      toast.error("Add items to cart");
+      toast.error("Add items");
       return;
     }
 
     if (!tableNumber) {
-      toast.error("Select table number");
+      toast.error("Select table");
       return;
     }
 
@@ -76,6 +79,7 @@ function UserApp({ logout }) {
         body: JSON.stringify(orderData),
       });
 
+      const data = await res.json();
       setLoading(false);
 
       if (res.ok) {
@@ -83,6 +87,7 @@ function UserApp({ logout }) {
 
         setUserOrder({
           ...orderData,
+          _id: data.orderId,
           status: "Pending",
         });
 
@@ -95,6 +100,7 @@ function UserApp({ logout }) {
     }
   };
 
+  // 🔥 LIVE STATUS UPDATE
   useEffect(() => {
     if (!userOrder) return;
 
@@ -103,9 +109,7 @@ function UserApp({ logout }) {
       const data = await res.json();
 
       const found = data.find(
-        (o) =>
-          o.table === userOrder.table &&
-          o.time === userOrder.time
+        (o) => o._id === userOrder._id
       );
 
       if (found) setUserOrder(found);
@@ -122,9 +126,11 @@ function UserApp({ logout }) {
         <div className="flex items-center gap-3">
           <img src={logo} className="w-10 h-10 rounded-full" />
           <div>
-            <h1 className="text-xl font-bold">Sahyadri Canteen</h1>
+            <h1 className="text-xl font-bold">
+              Sahyadri Canteen
+            </h1>
             <p className="text-gray-500 text-sm">
-              Campus Food Ordering System
+              Campus Food Ordering
             </p>
           </div>
         </div>
@@ -154,17 +160,35 @@ function UserApp({ logout }) {
         )}
       </div>
 
-      {/* MENU */}
+      {/* CATEGORY */}
+      <div className="flex gap-2 overflow-x-auto mb-4">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setCategory(cat)}
+            className={`px-3 py-1 rounded ${
+              category === cat
+                ? "bg-indigo-600 text-white"
+                : "bg-gray-200"
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* MAIN */}
       <div className="grid md:grid-cols-3 gap-6">
 
+        {/* FOOD */}
         <div className="md:col-span-2 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredItems.map((item) => (
             <FoodCard key={item.id} item={item} addToCart={addToCart} />
           ))}
         </div>
 
-        {/* CART */}
-        <div className="bg-white p-4 rounded shadow">
+        {/* CART (STICKY) */}
+        <div className="bg-white p-4 rounded shadow sticky top-4 h-fit">
           <Cart cart={cart} setCart={setCart} />
 
           <p className="font-bold mt-2">Total: ₹{total}</p>
@@ -184,8 +208,27 @@ function UserApp({ logout }) {
             onClick={placeOrder}
             className="mt-3 w-full bg-green-600 text-white py-2 rounded"
           >
-            Place Order
+            {loading ? "Placing..." : "Place Order"}
           </button>
+
+          {/* ORDER STATUS */}
+          {userOrder && (
+            <div className="mt-4 p-3 bg-gray-100 rounded">
+              <p className="font-semibold">Status:</p>
+              <p className="text-lg font-bold">
+                {userOrder.status}
+              </p>
+
+              <div className="mt-2">
+                {userOrder.items.map((item, i) => (
+                  <div key={i} className="flex justify-between">
+                    <span>{item.name}</span>
+                    <span>x{item.qty}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
       </div>
