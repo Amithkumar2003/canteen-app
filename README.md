@@ -1,16 +1,137 @@
-# React + Vite
+# Sahyadri Canteen Food Ordering System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack web application for managing food orders in a campus canteen. The system enables users to place orders and track their status in real time, while administrators can manage and update orders through a dedicated dashboard.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Live Application
 
-## React Compiler
+Frontend: https://canteen-app-gilt.vercel.app/
+Backend API: https://canteen-backend-yrmr.onrender.com
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### User
+
+* User registration and authentication
+* Browse food items by category
+* Add items to cart and place orders
+* View order summary with total cost
+* Real-time order status tracking
+* Notification when order is ready
+
+### Admin
+
+* Secure admin login
+* View all orders
+* Update order status (Pending, Preparing, Ready, Completed)
+* Remove completed orders
+* Automatic refresh of incoming orders
+
+---
+
+## Technology Stack
+
+Frontend:
+
+* React (Vite)
+* Tailwind CSS
+
+Backend:
+
+* Node.js
+* Express.js
+
+Database:
+
+* MongoDB Atlas
+
+Deployment:
+
+* Vercel (Frontend)
+* Render (Backend)
+
+---
+
+## Project Structure
+
+```
+canteen-app/
+│
+├── frontend/
+└── backend/
+```
+
+---
+
+## Installation and Setup
+
+### Clone Repository
+
+```
+git clone https://github.com/Amithkumar2003/canteen-app.git
+cd canteen-app
+```
+
+---
+
+### Backend Setup
+
+```
+cd backend
+npm install
+```
+
+Create a `.env` file and add:
+
+```
+MONGO_URI=your_mongodb_connection_string
+```
+
+Run the server:
+
+```
+node server.js
+```
+
+---
+
+### Frontend Setup
+
+```
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## Admin Access
+
+Username: admin
+Password: admin123
+
+---
+
+## Key Implementation Details
+
+* RESTful API architecture
+* MongoDB used for persistent storage
+* Order tracking implemented using polling
+* Clean separation of frontend and backend
+* Fully deployed and accessible online
+
+---
+
+## Author
+
+Amith Kumar
+GitHub: https://github.com/Amithkumar2003
+
+---
+
+## License
+
+This project is intended for educational purposes.
