@@ -98,18 +98,23 @@ app.post("/login", async (req, res) => {
 
 // ================= ORDERS =================
 
-// Place Order
+// ✅ PLACE ORDER (FIXED)
 app.post("/order", async (req, res) => {
   try {
     const order = req.body;
 
-    await Order.create({
+    const newOrder = await Order.create({
       ...order,
       status: "Pending",
     });
 
-    res.json({ message: "Order saved" });
-  } catch {
+    res.json({
+      message: "Order saved",
+      orderId: newOrder._id.toString(), // 🔥 IMPORTANT
+    });
+
+  } catch (err) {
+    console.log(err);
     res.status(500).json({ message: "Order error" });
   }
 });
