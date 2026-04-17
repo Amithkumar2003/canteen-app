@@ -132,19 +132,57 @@ function UserApp({ logout }) {
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8 pb-24 md:pb-8">
 
-      {/* HEADER */}
-      <div className="flex justify-between items-center mb-6 bg-white p-4 rounded shadow">
-        <div className="flex items-center gap-3">
-          <img src={logo} className="w-10 h-10 rounded-full" />
-          <h1 className="text-xl font-bold">Sahyadri Canteen</h1>
+      {/* ✅ HEADER WITH ORDER STATUS */}
+      <div className="mb-6 bg-white p-4 rounded shadow">
+
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <img src={logo} className="w-10 h-10 rounded-full" />
+            <h1 className="text-xl font-bold">Sahyadri Canteen</h1>
+          </div>
+
+          <button
+            onClick={logout}
+            className="bg-red-500 px-4 py-2 rounded text-white"
+          >
+            Logout
+          </button>
         </div>
 
-        <button
-          onClick={logout}
-          className="bg-red-500 px-4 py-2 rounded text-white"
-        >
-          Logout
-        </button>
+        {/* 🔥 ADDED STATUS (SAFE ADDITION) */}
+        {userOrder && (
+          <div className="mt-4 border-t pt-3 flex justify-between items-center">
+
+            <div>
+              <p className="text-sm text-gray-500">
+                Table: {userOrder.table}
+              </p>
+
+              <p className="font-semibold">
+                ₹
+                {userOrder.items.reduce(
+                  (sum, item) => sum + item.price * item.qty,
+                  0
+                )}
+              </p>
+            </div>
+
+            <span
+              className={`px-3 py-1 rounded text-white text-sm ${
+                userOrder.status === "Pending"
+                  ? "bg-gray-500"
+                  : userOrder.status === "Preparing"
+                  ? "bg-yellow-500"
+                  : userOrder.status === "Ready"
+                  ? "bg-blue-500"
+                  : "bg-green-600"
+              }`}
+            >
+              {userOrder.status}
+            </span>
+
+          </div>
+        )}
       </div>
 
       {/* SEARCH */}
@@ -184,7 +222,6 @@ function UserApp({ logout }) {
       {/* MAIN */}
       <div className="grid md:grid-cols-3 gap-6">
 
-        {/* FOOD */}
         <div className="md:col-span-2 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredItems.map((item) => (
             <FoodCard key={item.id} item={item} addToCart={addToCart} />
@@ -216,56 +253,12 @@ function UserApp({ logout }) {
         </div>
       </div>
 
-      {/* ✅ ORDER STATUS + DETAILS */}
-      {userOrder && (
-        <div className="mt-6 bg-white p-4 rounded shadow">
-          <p className="font-semibold mb-2">Order Status:</p>
-
-          <span
-            className={`px-3 py-1 rounded text-white text-sm ${
-              userOrder.status === "Pending"
-                ? "bg-gray-500"
-                : userOrder.status === "Preparing"
-                ? "bg-yellow-500"
-                : userOrder.status === "Ready"
-                ? "bg-blue-500"
-                : "bg-green-600"
-            }`}
-          >
-            {userOrder.status}
-          </span>
-
-          <p className="mt-2 text-sm text-gray-600">
-            Table: {userOrder.table}
-          </p>
-
-          <div className="mt-3">
-            {userOrder.items.map((item, i) => (
-              <div key={i} className="flex justify-between">
-                <span>{item.name}</span>
-                <span>
-                  x{item.qty} ₹{item.price * item.qty}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <p className="mt-3 font-bold text-lg">
-            Total: ₹
-            {userOrder.items.reduce(
-              (sum, item) => sum + item.price * item.qty,
-              0
-            )}
-          </p>
-        </div>
-      )}
-
       {/* MOBILE CART BAR */}
       {cart.length > 0 && (
         <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg p-3 flex justify-between items-center md:hidden z-[999]">
           <div>
             <p className="font-semibold text-sm">
-              {cart.length} item{cart.length > 1 && "s"}
+              {cart.length} item
             </p>
             <p className="text-sm text-gray-600">₹{total}</p>
           </div>
@@ -291,19 +284,7 @@ function UserApp({ logout }) {
             </button>
 
             <Cart cart={cart} setCart={setCart} />
-
             <p className="font-bold mt-2">Total: ₹{total}</p>
-
-            <select
-              value={tableNumber}
-              onChange={(e) => setTableNumber(e.target.value)}
-              className="mt-2 w-full p-2 border rounded"
-            >
-              <option value="">Select Table</option>
-              {[1,2,3,4,5,6,7,8,9,10].map((t) => (
-                <option key={t}>Table {t}</option>
-              ))}
-            </select>
 
             <button
               onClick={placeOrder}
