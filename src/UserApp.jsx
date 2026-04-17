@@ -87,36 +87,45 @@ function UserApp({ logout }) {
 
         setUserOrder({
           ...orderData,
-          _id: data.orderId,
+          _id: data.orderId, // ✅ store ID
           status: "Pending",
         });
 
         setCart([]);
         setTableNumber("");
+      } else {
+        toast.error("Order failed");
       }
-    } catch {
+    } catch (err) {
       setLoading(false);
+      console.log(err);
       toast.error("Server error");
     }
   };
 
-  // 🔥 LIVE STATUS UPDATE
+  // 🔥 LIVE STATUS UPDATE (FIXED)
   useEffect(() => {
-    if (!userOrder) return;
+    if (!userOrder?._id) return;
 
     const interval = setInterval(async () => {
-      const res = await fetch(`${BASE_URL}/orders`);
-      const data = await res.json();
+      try {
+        const res = await fetch(`${BASE_URL}/orders`);
+        const data = await res.json();
 
-      const found = data.find(
-        (o) => o._id === userOrder._id
-      );
+        const found = data.find(
+          (o) => String(o._id) === String(userOrder._id) // ✅ FIX
+        );
 
-      if (found) setUserOrder(found);
+        if (found) {
+          setUserOrder(found);
+        }
+      } catch (err) {
+        console.log(err);
+      }
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [userOrder]);
+  }, [userOrder?._id]);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
@@ -187,7 +196,7 @@ function UserApp({ logout }) {
           ))}
         </div>
 
-        {/* CART (STICKY) */}
+        {/* CART */}
         <div className="bg-white p-4 rounded shadow sticky top-4 h-fit">
           <Cart cart={cart} setCart={setCart} />
 
@@ -211,12 +220,16 @@ function UserApp({ logout }) {
             {loading ? "Placing..." : "Place Order"}
           </button>
 
-          {/* ORDER STATUS */}
+          {/* ✅ ORDER STATUS + DETAILS */}
           {userOrder && (
             <div className="mt-4 p-3 bg-gray-100 rounded">
               <p className="font-semibold">Status:</p>
               <p className="text-lg font-bold">
                 {userOrder.status}
+              </p>
+
+              <p className="text-sm text-gray-600">
+                Table: {userOrder.table}
               </p>
 
               <div className="mt-2">
