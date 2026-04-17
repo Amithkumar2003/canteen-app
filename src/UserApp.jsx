@@ -194,7 +194,6 @@ function UserApp({ logout }) {
         {/* DESKTOP CART */}
         <div className="bg-white p-4 rounded shadow sticky top-4 h-fit hidden md:block">
           <Cart cart={cart} setCart={setCart} />
-
           <p className="font-bold mt-2">Total: ₹{total}</p>
 
           <select
@@ -217,10 +216,53 @@ function UserApp({ logout }) {
         </div>
       </div>
 
+      {/* ✅ ORDER STATUS + DETAILS */}
+      {userOrder && (
+        <div className="mt-6 bg-white p-4 rounded shadow">
+          <p className="font-semibold mb-2">Order Status:</p>
+
+          <span
+            className={`px-3 py-1 rounded text-white text-sm ${
+              userOrder.status === "Pending"
+                ? "bg-gray-500"
+                : userOrder.status === "Preparing"
+                ? "bg-yellow-500"
+                : userOrder.status === "Ready"
+                ? "bg-blue-500"
+                : "bg-green-600"
+            }`}
+          >
+            {userOrder.status}
+          </span>
+
+          <p className="mt-2 text-sm text-gray-600">
+            Table: {userOrder.table}
+          </p>
+
+          <div className="mt-3">
+            {userOrder.items.map((item, i) => (
+              <div key={i} className="flex justify-between">
+                <span>{item.name}</span>
+                <span>
+                  x{item.qty} ₹{item.price * item.qty}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-3 font-bold text-lg">
+            Total: ₹
+            {userOrder.items.reduce(
+              (sum, item) => sum + item.price * item.qty,
+              0
+            )}
+          </p>
+        </div>
+      )}
+
       {/* MOBILE CART BAR */}
       {cart.length > 0 && (
         <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg p-3 flex justify-between items-center md:hidden z-[999]">
-
           <div>
             <p className="font-semibold text-sm">
               {cart.length} item{cart.length > 1 && "s"}
@@ -229,11 +271,8 @@ function UserApp({ logout }) {
           </div>
 
           <button
-            onClick={() => {
-              console.log("CLICK WORKING");
-              setShowCart(true);
-            }}
-            className="bg-green-600 text-white px-4 py-2 rounded relative z-[999]"
+            onClick={() => setShowCart(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded"
           >
             View Cart
           </button>
@@ -243,9 +282,7 @@ function UserApp({ logout }) {
       {/* MOBILE POPUP */}
       {showCart && (
         <div className="fixed inset-0 bg-black/40 z-[1000] flex items-end md:hidden">
-
           <div className="bg-white w-full p-4 rounded-t-xl max-h-[80%] overflow-y-auto">
-
             <button
               onClick={() => setShowCart(false)}
               className="mb-3 text-red-500"
@@ -274,7 +311,6 @@ function UserApp({ logout }) {
             >
               Place Order
             </button>
-
           </div>
         </div>
       )}
