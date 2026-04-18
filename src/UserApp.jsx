@@ -22,7 +22,6 @@ function UserApp({ logout }) {
 
   const addToCart = (item) => {
     const existing = cart.find((i) => i.id === item.id);
-
     if (existing) {
       setCart(
         cart.map((i) =>
@@ -72,9 +71,7 @@ function UserApp({ logout }) {
     try {
       const res = await fetch(`${BASE_URL}/order`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),
       });
 
@@ -118,7 +115,6 @@ function UserApp({ logout }) {
         ) {
           toast.success("Your order is ready!");
         }
-
         setUserOrder(found);
       }
     }, 3000);
@@ -127,18 +123,16 @@ function UserApp({ logout }) {
   }, [userOrder]);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-8 pb-32 md:pb-8">
+    <div className="min-h-screen bg-gray-100 p-4 md:p-8 pb-24 md:pb-8">
 
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6 bg-white p-4 rounded shadow">
-
         <div className="flex items-center gap-3">
           <img src={logo} className="w-10 h-10 rounded-full" />
           <h1 className="text-xl font-bold">Sahyadri Canteen</h1>
         </div>
 
         <div className="flex gap-2">
-
           {userOrder && (
             <button
               onClick={() => setShowOrder(true)}
@@ -147,14 +141,12 @@ function UserApp({ logout }) {
               Check Your Order
             </button>
           )}
-
           <button
             onClick={logout}
             className="bg-red-500 px-4 py-2 rounded text-white"
           >
             Logout
           </button>
-
         </div>
       </div>
 
@@ -194,7 +186,6 @@ function UserApp({ logout }) {
 
       {/* MAIN */}
       <div className="grid md:grid-cols-3 gap-6">
-
         <div className="md:col-span-2 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredItems.map((item) => (
             <FoodCard key={item.id} item={item} addToCart={addToCart} />
@@ -226,22 +217,6 @@ function UserApp({ logout }) {
         </div>
       </div>
 
-      {/* ✅ MOBILE TABLE SELECT (NEW FIX) */}
-      {cart.length > 0 && (
-        <div className="fixed bottom-20 left-0 w-full px-3 md:hidden z-[998]">
-          <select
-            value={tableNumber}
-            onChange={(e) => setTableNumber(e.target.value)}
-            className="w-full p-3 border rounded shadow bg-white"
-          >
-            <option value="">Select Table</option>
-            {[1,2,3,4,5,6,7,8,9,10].map((t) => (
-              <option key={t}>Table {t}</option>
-            ))}
-          </select>
-        </div>
-      )}
-
       {/* MOBILE CART BAR */}
       {cart.length > 0 && (
         <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-lg p-3 flex justify-between items-center md:hidden z-[999]">
@@ -265,6 +240,7 @@ function UserApp({ logout }) {
       {showCart && (
         <div className="fixed inset-0 bg-black/40 z-[1000] flex items-end md:hidden">
           <div className="bg-white w-full p-4 rounded-t-xl max-h-[80%] overflow-y-auto">
+
             <button
               onClick={() => setShowCart(false)}
               className="mb-3 text-red-500"
@@ -274,6 +250,18 @@ function UserApp({ logout }) {
 
             <Cart cart={cart} setCart={setCart} />
             <p className="font-bold mt-2">Total: ₹{total}</p>
+
+            {/* ✅ FIXED TABLE SELECT */}
+            <select
+              value={tableNumber}
+              onChange={(e) => setTableNumber(e.target.value)}
+              className="mt-3 w-full p-3 border rounded"
+            >
+              <option value="">Select Table</option>
+              {[1,2,3,4,5,6,7,8,9,10].map((t) => (
+                <option key={t}>Table {t}</option>
+              ))}
+            </select>
 
             <button
               onClick={placeOrder}
@@ -292,7 +280,18 @@ function UserApp({ logout }) {
 
             <h2 className="font-semibold mb-2">Order Status:</h2>
 
-            <span className="px-3 py-1 bg-gray-500 text-white rounded">
+            {/* ✅ SAME COLOR AS ADMIN */}
+            <span
+              className={`px-3 py-1 rounded text-white ${
+                userOrder.status === "Pending"
+                  ? "bg-gray-500"
+                  : userOrder.status === "Preparing"
+                  ? "bg-yellow-500"
+                  : userOrder.status === "Ready"
+                  ? "bg-blue-500"
+                  : "bg-green-600"
+              }`}
+            >
               {userOrder.status}
             </span>
 
@@ -324,7 +323,6 @@ function UserApp({ logout }) {
           </div>
         </div>
       )}
-
     </div>
   );
 }
